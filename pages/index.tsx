@@ -1,22 +1,27 @@
 import Head from 'next/head'
+import { Header } from '../components/header';
+import { Car, User } from '../models';
 import styles from '../styles/Home.module.css'
+import { getOrCreateConnection } from '../util';
 
-export default function Home() {
+export default function Home(props) {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
+        <title>Next App TEST</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Header />
+
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
+          Welcome to <a href="https://nextjs.org">Next.js! + TypeScript</a>
         </h1>
 
         <p className={styles.description}>
           Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
+          <code className={styles.code}>pages/index.tsx</code>
         </p>
 
         <div className={styles.grid}>
@@ -48,6 +53,16 @@ export default function Home() {
             </p>
           </a>
         </div>
+        <div className={styles.grid}>
+          {props.users.map((el: User, index) => {
+            return (<>
+              <a key={'a'+index} className={styles.card}>
+                <h3 key={'h3'+index}>{el.name} &rarr;</h3>
+                <p key={'p'+index}>{el.lastName}</p>
+              </a>
+            </>)
+          })}
+        </div>
       </main>
 
       <footer className={styles.footer}>
@@ -62,4 +77,27 @@ export default function Home() {
       </footer>
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  const conn = await getOrCreateConnection();
+  const userRepo = conn.getRepository<User>("User");
+  const carRepo = conn.getRepository<Car>("Car");
+  const localUsers = await userRepo.find();
+  const localCars = await carRepo.find();
+  console.log(`${localUsers.length} users fetched from the database`);
+  console.log(`${localCars.length} cars fetched from the database`);
+
+  const localUserMap = localUsers.map((el: User) => {
+    return {
+      id: el.id,
+      name: el.name,
+      lastName: el.lastName
+    };
+  });
+  return {
+    props: {
+      users: localUserMap
+    }
+  }
 }
