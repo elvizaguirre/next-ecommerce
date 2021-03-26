@@ -1,14 +1,18 @@
 import Link from 'next/link';
 import styles from  '../styles/Header.module.css';
+import { signIn, signOut, useSession } from 'next-auth/client'
 
-export const Header = () => {
-//    const user = getUserLogued();
+export const Header = (props) => {
+    const user = props.user || {};
+    //const [ session, loading ] = useSession()
+console.log(props);
     return (
       <>
       <div className={styles.headerGlobal}>
              <img src="/banner.png" alt="CafeXYZ" style={{width: '100%', height:"min-content"}}/>
       </div>
       <div className={styles.header}>
+      {!props.noNav? ( <>
         <div className={styles.logoNav}>
           <ul className={styles.navOptions}>
             <li className={styles.option}>
@@ -37,48 +41,34 @@ export const Header = () => {
               </Link>
             </li>
           </ul>
-
-          <p>You are not logued in!</p>
-          <ul className={styles.signinUp}>
-            <li className={styles.signIn}>
-              <Link href={'/login'}>
-                  <a className={"nav-link"}>SIGN-IN</a>
-              </Link>
-            </li>
-            <li>
-              <Link href={'/register'}>
-                  <a className={"nav-link " + styles.signupBtn}>SIGN-UP</a>
-              </Link>
-            </li>
-          </ul>
         </div>
-        {/* user ? (
+        {user.name ? (
           <>
-          Welcome {user.name? user.name + ' ' + user.lastName : user.email }
+          <p>Welcome {user.name? user.name + ' ' + user.lastName : user.email } </p>
           <ul className="signin-up">
-            <li onClick={()=>{ authenticationService.logout()}}>
-              <Link
-                to={'/'}
-                className="nav-link signup-btn"
-              >
-                Logout
+            <li /* onClick={()=>{ authenticationService.logout()}} */ >
+              <Link href={'/'}>
+                <a className="nav-link signupBtn">Logout</a>
               </Link>
             </li>
           </ul>
           </>
           ):(
           <>
-          You are not logued in!
-          <ul className="signin-up">
-            <li className="sign-in">
-              <Link to={'/login'} className="nav-link">SIGN-IN</Link>
+          <p>You are not logued in!</p>
+          <ul className={styles.signinUp}>
+            <li className={styles.signIn}>
+                <a className={"nav-link"} onClick={() =>{signIn()}}>SIGN-IN</a>
             </li>
             <li>
-              <Link to={'/register'} className="nav-link signup-btn">SIGN-UP</Link>
+              <Link href={'/register'}>
+                <a className={"nav-link "+styles.signupBtn}>SIGN-UP</a>
+              </Link>
             </li>
           </ul>
-          </>) */}
-        
+          </>)
+        }
+      </>) : null }
       </div>
       </>
     );

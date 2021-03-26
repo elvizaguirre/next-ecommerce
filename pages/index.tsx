@@ -1,18 +1,12 @@
-import Head from 'next/head'
-import { Header } from '../components/header';
-import { Car, User } from '../models';
-import styles from '../styles/Home.module.css'
+import Layout from '../components/layout';
+import { Car, Product } from '../models';
+import styles from '../styles/Home.module.css';
 import { getOrCreateConnection } from '../util';
 
 export default function Home(props) {
   return (
+    <Layout title="ASEDDA">
     <div className={styles.container}>
-      <Head>
-        <title>Next App TEST</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <Header />
 
       <main className={styles.main}>
         <h1 className={styles.title}>
@@ -25,7 +19,25 @@ export default function Home(props) {
         </p>
 
         <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
+        
+          {props.users.map((el: Product) => {
+            return (<>
+              <a href="#" className={styles.card}>
+                <h3>{el.name}&rarr;</h3>
+                <p>{el.price}</p>
+                <h3>{el.picture} &rarr;</h3>
+              </a>
+            </>);
+          })}
+        </div>
+      </main>
+    </div>
+    </Layout>
+  )
+}
+
+/*
+ *<a href="https://nextjs.org/docs" className={styles.card}>
             <h3>Documentation &rarr;</h3>
             <p>Find in-depth information about Next.js features and API.</p>
           </a>
@@ -33,71 +45,26 @@ export default function Home(props) {
           <a href="https://nextjs.org/learn" className={styles.card}>
             <h3>Learn &rarr;</h3>
             <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-        <div className={styles.grid}>
-          {props.users.map((el: User, index) => {
-            return (<>
-              <a key={'a'+index} className={styles.card}>
-                <h3 key={'h3'+index}>{el.name} &rarr;</h3>
-                <p key={'p'+index}>{el.lastName}</p>
-              </a>
-            </>)
-          })}
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
-}
+          </a> 
+ * 
+ */
 
 export async function getServerSideProps() {
   const conn = await getOrCreateConnection();
-  const userRepo = conn.getRepository<User>("User");
-  const carRepo = conn.getRepository<Car>("Car");
-  const localUsers = await userRepo.find();
-  const localCars = await carRepo.find();
-  console.log(`${localUsers.length} users fetched from the database`);
-  console.log(`${localCars.length} cars fetched from the database`);
+  const productsRepo = conn.getRepository<Product>("Product");
+  const products = await productsRepo.find();
 
-  const localUserMap = localUsers.map((el: User) => {
+  const localProductMap = products.map((el: Product) => {
     return {
       id: el.id,
       name: el.name,
-      lastName: el.lastName
+      price: el.price,
+      picture: el.picture
     };
   });
   return {
     props: {
-      users: localUserMap
+      users: localProductMap
     }
   }
 }
